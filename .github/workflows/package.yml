@@ -1,0 +1,36 @@
+name: 打包 Windows EXE
+
+on:
+  push:
+    branches: [ "main" ]  # 当你向 main 分支推送代码时触发
+  workflow_dispatch:      # 允许你在 GitHub 页面上手动触发
+
+jobs:
+  build:
+    runs-on: windows-latest  # 使用 GitHub 提供的 Windows 虚拟机
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+
+    - name: 设置 Python 环境
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10' # 设定你需要的 Python 版本
+
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        # 如果你有其他库，在这里添加，例如：
+        # pip install -r requirements.txt 
+
+    - name: 执行打包命令
+      run: |
+        pyinstaller --onefile --windowed main.py  # 替换为你的文件名
+
+    - name: 上传打包好的文件
+      uses: actions/upload-artifact@v4
+      with:
+        name: MyWindowsApp  # 下载时的压缩包名称
+        path: dist/*.exe    # 指向生成的 exe 路径
